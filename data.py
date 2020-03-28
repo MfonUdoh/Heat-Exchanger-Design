@@ -34,6 +34,7 @@ m = 0.02687
 Rho = 100
 
 nitrogen = Component(Cp, m, Rho, Ti, To)
+nitrogen.add_data("nitrogen")
 
 ### Hot Refrigerant ###
 
