@@ -53,9 +53,9 @@ if mode == "SM":
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     surf = ax.plot_surface(m, U, Z, rstride=1, cstride=1, cmap=cm.winter, edgecolor='none')
-    ax.set_xlabel('Air Mass Flowrate kg/s')
-    ax.set_ylabel('Overall Heat Transfer Coefficient W/m^2K')
-    ax.set_zlabel('Heat Exchanger Area m^2')
+    ax.set_xlabel('Air Mass Flowrate [kg/s]')
+    ax.set_ylabel('Overall Heat Transfer Coefficient [W/m^2K]')
+    ax.set_zlabel('Heat Exchanger Area [m^2]')
     ax.set_title('Sensitivity Analysis')
     plt.show()
 
@@ -63,7 +63,7 @@ if mode == "ST":
     ### HTU Sensitivity Analysis on outlet temperature ###
 
     T = np.arange(289, 297, 0.05)
-    U = np.arange(10, 150, 5)
+    U = np.arange(10, 155, 5)
     m = HEX1.hotFluid.m
     n = 50
 
@@ -73,17 +73,17 @@ if mode == "ST":
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     surf = ax.plot_surface(T, U, Z, rstride=1, cstride=1, cmap=cm.winter, edgecolor='none')
-    ax.set_xlabel('Air Outlet Temperature K')
-    ax.set_ylabel('Overall Heat Transfer Coefficient W/m^2K')
-    ax.set_zlabel('Heat Exchanger Area m^2')
+    ax.set_xlabel('Air Outlet Temperature [K]')
+    ax.set_ylabel('Overall Heat Transfer Coefficient [W/m^2K]')
+    ax.set_zlabel('Heat Exchanger Area [m^2]')
     ax.set_title('Sensitivity Analysis')
     plt.show()
 
 if mode == "SL":
     ### HTU Sensitivity Analysis on length ###
 
-    L = np.arange(0.5, 2, 0.1)
-    Di = np.arange(0.05, 0.2, 0.01)
+    L = np.arange(0.5, 1.55, 0.05)
+    Di = np.arange(0.01, 0.055, 0.005)
     A = 10
     n = 50
 
@@ -93,8 +93,8 @@ if mode == "SL":
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     surf = ax.plot_surface(L, Di, Z, rstride=1, cstride=1, cmap=cm.winter, edgecolor='none')
-    ax.set_xlabel('Length m')
-    ax.set_ylabel('Diameter m')
-    ax.set_zlabel('Tubes Required -')
+    ax.set_xlabel('Length [m]')
+    ax.set_ylabel('Diameter [m]')
+    ax.set_zlabel('Tubes Required [-]')
     ax.set_title('Sensitivity Analysis')
     plt.show()
