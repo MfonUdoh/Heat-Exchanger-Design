@@ -96,8 +96,8 @@ hexType = 'tube'
 coldFluid = nitrogen
 hotFluid = air1
 U = 120
-Di = 0.05
-L = 0.5
+Di = 0.02
+L = 0.25
 
 HEX1 = HeatExchanger(hexType, coldFluid, hotFluid, U, Di, L)
 

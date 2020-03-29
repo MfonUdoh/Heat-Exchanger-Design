@@ -35,9 +35,12 @@ class HeatExchanger():
 
         return T_lm, A_lm, Q, int(tubes)
 
-    def sizeHTU(self, basis, slices):
+    def sizeHTU(self, basis, slices, m, U):
         """This function gives and estimation of the required heat transfer area of the heat exchanger using the heat transfer units method.
         This method makes use of enthalpy data from NIST, a number of slices are defined and the area is approximated as linear across these slices."""
+        
+        self.hotFluid.m = m
+        self.U = U
         
         if slices == 0:
             return 0, 0
@@ -71,4 +74,4 @@ class HeatExchanger():
         
         tubes = sum(As) / (np.pi*self.Di*self.L)
 
-        return sum(As), int(tubes)
+        return sum(As)

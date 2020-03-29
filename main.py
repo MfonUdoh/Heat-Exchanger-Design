@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from data import *
 
 print("Which mode do you want to use? (L)MTD or (H)TU?")
@@ -21,10 +23,21 @@ if mode == "L" or mode == "l":
 
 if mode == "H" or mode == "h":
     ### HTU Estimation ###
-    n = [x for x in range(0, 51, 5)]
-    for i in n:
-        A, tubes = HEX1.sizeHTU('hot', i)
-        print("""
-        Using {} slices
-        HEX area: {} m^2
-        Tubes required: {}""".format(i, A, tubes))
+    # n = [x+1 if x == 0for x in range(0, 51, 5)]
+    m = np.arange(0.01, 3, 0.02)
+    U = np.arange(10, 100, 10)
+    n = 50
+
+    y = np.array(U)
+    x = np.array(m)
+    X, Y = np.meshgrid(x, y)
+    Z = HEX1.sizeHTU('hot', n, X, Y)
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.winter, edgecolor='none')
+    ax.set_xlabel('Air Mass Flowrate kg/s')
+    ax.set_ylabel('Overall Heat Transfer Coefficient W/m^2K')
+    ax.set_zlabel('Heat Exchanger Area m^2')
+    ax.set_title('Sensitivity Analysis')
+    plt.show()
