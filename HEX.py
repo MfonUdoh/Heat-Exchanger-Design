@@ -8,6 +8,8 @@ class HeatExchanger():
         self.U = float(U) # Overall Heat Transfer Coeff, W/m2K
         self.Di = float(Di) # Internal Diameter, m
         self.L = float(L) # Length of tubes, m
+        self.Qs = [] # List of heat transfers by temperature section, W
+        self.As = [] # List of areas by temperature section, m^2
     
     def LMTD(self, Thi, Tho, Tci, Tco):
         dT1 = Thi - Tco
@@ -57,9 +59,9 @@ class HeatExchanger():
         Qs = []
         hotTs = [self.hotFluid.To]
         for i in range(1, len(coldHs)):
-            Q = (coldHs[i] - coldHs[i-1])*self.coldFluid.m*1000
+            Q = (coldHs[i] - coldHs[i-1]) * self.coldFluid.m * 1000
             Qs.append(Q)
-            hotTs.append((Q/(self.hotFluid.m*self.hotFluid.Cp)+hotTs[-1]))
+            hotTs.append((Q/(self.hotFluid.m * self.hotFluid.Cp)+hotTs[-1]))
         
         As = []
         for i in range(1, len(hotTs)):
@@ -71,6 +73,11 @@ class HeatExchanger():
             T_lm = self.LMTD(hoti, hoto, coldi, coldo)
             A_lm = Q/(self.U*T_lm)
             As.append(A_lm)
+
+        self.coldFluid.Tdistro = coldTs
+        self.hotFluid.Tdistro = hotTs
+        self.Qs = Qs
+        self.As = As
 
         return sum(As)
 
@@ -86,3 +93,12 @@ class HeatExchanger():
         self.Di = Di
 
         return self.tubes_required(A)
+
+    def heat_map(self, basis, slices):
+        self.sizeHTU(basis, slices)
+        ADistro = [0]
+        ASum = 0
+        for i in self.As:
+            ASum += i
+            ADistro.append(ASum)
+        return self.coldFluid.Tdistro, self.hotFluid.Tdistro, ADistro

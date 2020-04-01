@@ -6,6 +6,7 @@ class Component():
         self.Ti = float(Ti) # Hot Inlet Temperature, K
         self.To = float(To) # Hot Oulet Temperature, K
         self.TH = [] # Temperature-Enthalpy data for the component in a nx2 array
+        self.Tdistro = [] # Temperature distribution across the Heat Exchanger
 
     def add_data(self, datafile):
         """Use this function to add data from NIST in a delimited table txt format

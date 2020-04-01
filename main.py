@@ -9,7 +9,9 @@ print("""Which mode do you want to use?
 (H)TU area estimation
 (ST) Sensitivity analysis on temperature
 (SM) Sensitivity analysis on mass flowrate
-(SL) Sensitivity analysis on length""")
+(SL) Sensitivity analysis on length
+(HP) Heat Plot
+(HM) Heat Map""")
 mode = input().upper()
 
 if mode == "L":
@@ -97,4 +99,44 @@ if mode == "SL":
     ax.set_ylabel('Diameter m')
     ax.set_zlabel('Tubes Required -')
     ax.set_title('Sensitivity Analysis')
+    plt.show()
+
+if mode == 'HP':
+    ### Heat plot of fluids across the heat exchanger ###
+
+    n = [1,10,50]
+    
+    ax1 = plt.subplot(2,1,1)
+    ax2 = plt.subplot(2,1,2)
+    for i in n:
+        coldDistro, hotDistro, ADistro = HEX1.heat_map('hot', i)
+        ax1.plot(ADistro, coldDistro, label="n={}".format(i))
+        ax2.plot(ADistro, hotDistro, label="n={}".format(i))
+    ax1.legend(loc='best', shadow=True, fancybox=True)
+    ax2.legend(loc='best', shadow=True, fancybox=True)
+    ax1.set_ylabel('Cold Fluid Temperature [K]')
+    ax2.set_xlabel('Position in Heat Exchanger [m]')
+    ax2.set_ylabel('Hot Fluid Temperature [K]')
+
+    plt.show()
+
+if mode == 'HM':
+    ### Heat map of fluids across the heat exchanger ###
+
+    N = [10,100]
+    for n in N:
+        plt.figure(n)
+        ax1 = plt.subplot(2,1,1)
+        ax2 = plt.subplot(2,1,2)
+        coldDistro, hotDistro, ADistro = HEX1.heat_map('hot', n)
+        y = np.arange(0,1,0.1)
+        y, ADistro = np.meshgrid(y, ADistro)
+        y = np.arange(0,1,0.1)
+        y, coldDistro = np.meshgrid(y, coldDistro)
+        ax1.plot(ADistro, coldDistro)
+        ax2.pcolormesh(ADistro, y, coldDistro, cmap='coolwarm')
+        ax1.set_title("n={}".format(n))
+        ax1.set_ylabel('Cold Fluid Temperature [K]')
+        ax2.set_xlabel('Position in Heat Exchanger [m]')
+        ax2.set_yticklabels([])
     plt.show()
