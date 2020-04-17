@@ -1,7 +1,8 @@
 import numpy as np
 
 class HeatExchanger():
-    def __init__(self, config, cold, hot, U, Di, L):
+    def __init__(self, name, config, cold, hot, U, Di, L):
+        self.name = name
         self.type = config
         self.coldFluid = cold
         self.hotFluid = hot
@@ -11,6 +12,9 @@ class HeatExchanger():
         self.Qs = [] # List of heat transfers by temperature section, W
         self.As = [] # List of areas by temperature section, m^2
     
+    def __str__(self):
+        return self.name
+
     def LMTD(self, Thi, Tho, Tci, Tco):
         dT1 = Thi - Tco
         dT2 = Tho - Tci

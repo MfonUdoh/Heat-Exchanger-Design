@@ -22,12 +22,12 @@ if mode == "L":
         LMTD, areaLMTD, Q = process[i][0].sizeLMTD(process[i][1])
         tubes = process[i][0].tubes_required(areaLMTD)
         print("""
-        HEX{}
+        {}
         LMTD: {}
         LMTD Area Estimation: {} m^2
         Heat Duty: {} kW
         Number of tubes required: {}
-        """.format((i+1), LMTD, areaLMTD, Q/1000, tubes))
+        """.format(str(process[i][0]), LMTD, areaLMTD, Q/1000, tubes))
 
 if mode == "H":
     ### HTU Estimation ###
@@ -37,9 +37,10 @@ if mode == "H":
         A = HEX1.sizeHTU('hot', slices)
         tubes = HEX1.tubes_required(A)
         print("""
+        {}
         Using {} slices
         Area: {} m^2
-        Tubes: {} """.format(slices, A, tubes))
+        Tubes: {} """.format(str(HEX1), slices, A, tubes))
 
 if mode == "SM":
     ### HTU Sensitivity Analysis on mass flowrate###
@@ -52,13 +53,13 @@ if mode == "SM":
     U, m = np.meshgrid(U, m)
     Z = HEX1.sensitivity_area('hot', n, U, T, m)
 
-    fig = plt.figure()
+    fig = plt.figure(str(HEX1))
     ax = fig.gca(projection='3d')
     surf = ax.plot_surface(m, U, Z, rstride=1, cstride=1, cmap=cm.winter, edgecolor='none')
     ax.set_xlabel('Air Mass Flowrate [kg/s]')
     ax.set_ylabel('Overall Heat Transfer Coefficient [W/m^2K]')
     ax.set_zlabel('Heat Exchanger Area [m^2]')
-    ax.set_title('Sensitivity Analysis')
+    ax.set_title('Sensitivity Analysis on ' + str(HEX1))
     plt.show()
 
 if mode == "ST":
@@ -72,13 +73,13 @@ if mode == "ST":
     U, T = np.meshgrid(U, T)
     Z = HEX1.sensitivity_area('hot', n, U, T, m)
 
-    fig = plt.figure()
+    fig = plt.figure(str(HEX1))
     ax = fig.gca(projection='3d')
     surf = ax.plot_surface(T, U, Z, rstride=1, cstride=1, cmap=cm.winter, edgecolor='none')
     ax.set_xlabel('Air Outlet Temperature [K]')
     ax.set_ylabel('Overall Heat Transfer Coefficient [W/m^2K]')
     ax.set_zlabel('Heat Exchanger Area [m^2]')
-    ax.set_title('Sensitivity Analysis')
+    ax.set_title('Sensitivity Analysis on ' + str(HEX1))
     plt.show()
 
 if mode == "SL":
@@ -92,20 +93,20 @@ if mode == "SL":
     L, Di = np.meshgrid(L, Di)
     Z = HEX1.sensitivity_length('hot', n, A, L, Di)
 
-    fig = plt.figure()
+    fig = plt.figure(str(HEX1))
     ax = fig.gca(projection='3d')
     surf = ax.plot_surface(L, Di, Z, rstride=1, cstride=1, cmap=cm.winter, edgecolor='none')
     ax.set_xlabel('Length [m]')
     ax.set_ylabel('Diameter [m]')
     ax.set_zlabel('Tubes Required [-]')
-    ax.set_title('Sensitivity Analysis')
+    ax.set_title('Sensitivity Analysis on ' + str(HEX1))
     plt.show()
 
 if mode == 'HP':
     ### Heat plot of fluids across the heat exchanger ###
 
     n = [1,10,50]
-    
+    plt.figure(str(HEX1))
     ax1 = plt.subplot(2,1,1)
     ax2 = plt.subplot(2,1,2)
     for i in n:
@@ -114,6 +115,7 @@ if mode == 'HP':
         ax2.plot(ADistro, hotDistro, label="n={}".format(i))
     ax1.legend(loc='best', shadow=True, fancybox=True)
     ax2.legend(loc='best', shadow=True, fancybox=True)
+    ax1.set_title(str(HEX1))
     ax1.set_ylabel('Cold Fluid Temperature [K]')
     ax2.set_xlabel('Position in Heat Exchanger [m]')
     ax2.set_ylabel('Hot Fluid Temperature [K]')
@@ -125,7 +127,7 @@ if mode == 'HM':
 
     N = [10,100]
     for n in N:
-        plt.figure(n)
+        plt.figure(str(HEX1) + " with n = {}".format(n))
         ax1 = plt.subplot(2,1,1)
         ax2 = plt.subplot(2,1,2)
         coldDistro, hotDistro, ADistro = HEX1.heat_map('hot', n)
@@ -135,7 +137,7 @@ if mode == 'HM':
         y, coldDistro = np.meshgrid(y, coldDistro)
         ax1.plot(ADistro, coldDistro)
         ax2.pcolormesh(ADistro, y, coldDistro, cmap='coolwarm')
-        ax1.set_title("n={}".format(n))
+        ax1.set_title(str(HEX1) + " with n = {}".format(n))
         ax1.set_ylabel('Cold Fluid Temperature [K]')
         ax2.set_xlabel('Position in Heat Exchanger [m]')
         ax2.set_yticklabels([])

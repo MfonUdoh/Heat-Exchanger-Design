@@ -92,6 +92,7 @@ air3 = Component(Cp, m, Rho, Ti, To)
 
 ### HEX 1 ###
 
+name = 'Heat Exchanger 1 (E-3)'
 hexType = 'tube'
 coldFluid = nitrogen
 hotFluid = air1
@@ -99,10 +100,11 @@ U = 120
 Di = 0.02
 L = 0.25
 
-HEX1 = HeatExchanger(hexType, coldFluid, hotFluid, U, Di, L)
+HEX1 = HeatExchanger(name, hexType, coldFluid, hotFluid, U, Di, L)
 
 ### HEX 2 ###
 
+name = 'Heat Exchanger 2'
 hexType = 'tube'
 coldFluid = hef
 hotFluid = refHot
@@ -110,10 +112,11 @@ U = 300
 Di = 0.1
 L = 1
 
-HEX2 = HeatExchanger(hexType, coldFluid, hotFluid, U, Di, L)
+HEX2 = HeatExchanger(name, hexType, coldFluid, hotFluid, U, Di, L)
 
 ### HEX 3 ###
 
+name = 'Heat Exchanger 3'
 hexType = 'tube'
 coldFluid = refCold
 hotFluid = air2
@@ -121,15 +124,4 @@ U = 170
 Di = 0.05
 L = 0.5
 
-HEX3 = HeatExchanger(hexType, coldFluid, hotFluid, U, Di, L)
-
-### HEX 4 ###
-
-hexType = 'tube'
-coldFluid = ammonia
-hotFluid = air3
-U = 70
-Di = 0.05
-L = 0.5
-
-HEX4 = HeatExchanger(hexType, coldFluid, hotFluid, U, Di, L)
+HEX3 = HeatExchanger(name, hexType, coldFluid, hotFluid, U, Di, L)
