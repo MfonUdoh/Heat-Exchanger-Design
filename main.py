@@ -7,6 +7,7 @@ from data import *
 print("""Which mode do you want to use?
 (L)MTD area estimation
 (H)TU area estimation
+(O)ptimise
 (ST) Sensitivity analysis on temperature
 (SM) Sensitivity analysis on mass flowrate
 (SL) Sensitivity analysis on length
@@ -17,7 +18,7 @@ mode = input().upper()
 if mode == "L":
     ### LMTD Estimation ###
 
-    process = [[HEX1, 'hot'], [HEX2, 'cold'], [HEX3, 'hot'], [HEX4, 'hot']]
+    process = [[HEX1, 'hot'], [HEX2, 'cold'], [HEX3, 'hot']]
     for i in range(len(process)):
         LMTD, areaLMTD, Q = process[i][0].sizeLMTD(process[i][1])
         tubes = process[i][0].tubes_required(areaLMTD)
@@ -41,6 +42,43 @@ if mode == "H":
         Using {} slices
         Area: {} m^2
         Tubes: {} """.format(str(HEX1), slices, A, tubes))
+
+if mode == "O":
+    ### HTU Optimisation for cold fluid flow ###
+
+    m = [2.03576, 0.89]#np.arange(0.5, 0.91, 0.10)
+    for mass in m:
+        HEX1.hotFluid.m = mass
+        n = [75]
+        for slices in n:
+            repeat = True
+            while repeat:
+                A = HEX1.sizeHTU('hot', slices)
+                tubes = HEX1.tubes_required(A)
+                tolerance = 1
+                if HEX1.hotFluid.Tdistro[-1] >= HEX1.hotFluid.Ti - tolerance and HEX1.hotFluid.Tdistro[-1] <= HEX1.hotFluid.Ti + tolerance:
+                    repeat = False
+                elif HEX1.hotFluid.Tdistro[-1] >= HEX1.hotFluid.Ti - tolerance:
+                    HEX1.coldFluid.m -= 0.0001
+                    # print('got {} K, add, trying {} kg/s'.format(HEX1.hotFluid.Tdistro[-1], HEX1.coldFluid.m))
+                elif HEX1.hotFluid.Tdistro[-1] <= HEX1.hotFluid.Ti + tolerance:
+                    HEX1.coldFluid.m += 0.0001
+                    # print('got {} K, sub, trying {} kg/s'.format(HEX1.hotFluid.Tdistro[-1], HEX1.coldFluid.m))
+                # else:
+                    # print('fuck, trying {}'.format(HEX1.coldFluid.m))
+            
+            print("""
+            {}
+            Using {} slices
+            Overall Coeff: {}
+            Area: {} m^2
+            Duty: {} W
+            Tubes: {}
+            Hot Temps: {} -> {}
+            Hot Flow: {} kg s^-1
+            Cold Temps: {} -> {}
+            Cold Flow: {} kg s^-1""".format(str(HEX1), slices, HEX1.U, A, sum(HEX1.Qs), tubes, HEX1.hotFluid.Tdistro[-1], HEX1.hotFluid.Tdistro[0], HEX1.hotFluid.m, HEX1.coldFluid.Tdistro[0], HEX1.coldFluid.Tdistro[-1], HEX1.coldFluid.m))
+
 
 if mode == "SM":
     ### HTU Sensitivity Analysis on mass flowrate###
@@ -105,7 +143,7 @@ if mode == "SL":
 if mode == 'HP':
     ### Heat plot of fluids across the heat exchanger ###
 
-    n = [1,10,50]
+    n = [100]
     plt.figure(str(HEX1))
     ax1 = plt.subplot(2,1,1)
     ax2 = plt.subplot(2,1,2)
@@ -117,7 +155,7 @@ if mode == 'HP':
     ax2.legend(loc='best', shadow=True, fancybox=True)
     ax1.set_title(str(HEX1))
     ax1.set_ylabel('Cold Fluid Temperature [K]')
-    ax2.set_xlabel('Position in Heat Exchanger [m]')
+    ax2.set_xlabel('Position in Heat Exchanger [m^2]')
     ax2.set_ylabel('Hot Fluid Temperature [K]')
 
     plt.show()
@@ -125,7 +163,7 @@ if mode == 'HP':
 if mode == 'HM':
     ### Heat map of fluids across the heat exchanger ###
 
-    N = [10,100]
+    N = [5,10,20,100]
     for n in N:
         plt.figure(str(HEX1) + " with n = {}".format(n))
         ax1 = plt.subplot(2,1,1)
