@@ -23,7 +23,7 @@ class Component():
                 temp = i
             if counter == 5: # Selects the enthalpy column from the NIST data
                 enth = i
-                self.TH.append([temp, enth])
+                self.TH.append([float(temp), float(enth)])
             if counter < 13: # Loops back at the end of the NIST data table
                 counter += 1
             else:
@@ -42,14 +42,18 @@ class Component():
         else:
             print('invalid lookup')
 
-        for i in range(len(self.TH)): # Loop finds the closest value in the data to the input valua
-            if min == [] or float(value - float(self.TH[i][ref]))**2 < min[1]:
-                min = [i, float(value - float(self.TH[i][ref]))**2]
-        minVal = min[0]
+        for i in range(len(self.TH)-1): # Loop finds the closest value in the data to the input value
+            x1 = self.TH[i][0]
+            x2 = self.TH[i+1][0]
+            y1 = self.TH[i][1]
+            y2 = self.TH[i+1][1]
+            if value - x1 >= 0 and value - x2 <= 0:
+                gradient = (y2 - y1) / (x2 - x1)
+                result = y1 + (value-x1)*gradient
         if ref == 0:
             # print("Found reference for {} K, gives {} kJ/kg".format(self.TH[minVal][0], self.TH[minVal][1]))
-            return float(self.TH[minVal][1])
+            return result
         if ref == 1:
             # print("Found reference for {} kJ/kg, gives {} K".format(self.TH[minVal][0], self.TH[minVal][1]))
-            return float(self.TH[minVal][0])
+            return result
 
