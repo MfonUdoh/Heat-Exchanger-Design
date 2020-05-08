@@ -5,86 +5,34 @@ from HEX import *
 ### Fluid Properties ###
 ########################
 
-### Air 1 ###
+### Air ###
 
 Ti = 298.0
 To = 293.0
-Cp = 1003.0
+Cp = 1012
 m = 2.03576
-Rho = 1.22
+Rho = 1.184
+mu = 0.00001983
+mu_w = 0.00001983
+R_f = 0.0001
+k = 0.026055
 
-air1 = Component(Cp, m, Rho, Ti, To)
-
-# ### Air 2 ###
-
-# Ti = 298
-# To = 293
-# Cp = 1987.0
-# m = 1.44700
-# Rho = 1.22
-
-# air2 = Component(Cp, m, Rho, Ti, To)
+air = Component(Cp, m, Rho, Ti, To, mu, mu_w, R_f, k)
 
 ### Nitrogen ###
 
 Ti = 93.0
 To = 288.0
-Cp = 1003.0
+Cp = 1932.8
 m = 0.02687
-Rho = 100.0
+Rho = 183.6
+mu = 0.0000234342
+mu_w = 0.000012352
+R_f = 0.0001
+k = 0.034983363
 
-nitrogen = Component(Cp, m, Rho, Ti, To)
+nitrogen = Component(Cp, m, Rho, Ti, To, mu, mu_w, R_f, k)
 nitrogen.add_data("nitrogen40bar")
-
-# ### Hot Refrigerant ###
-
-# Ti = 344
-# To = 293
-# Cp = 1003 
-# m = 0.04743
-# Rho = 1.22
-
-# refHot = Component(Cp, m, Rho, Ti, To)
-
-# ### Cold Refrigerant ###
-
-# Ti = 253
-# To = 283
-# Cp = 1003
-# m = 0.04743
-# Rho = 1.22
-
-# refCold = Component(Cp, m, Rho, Ti, To)
-
-# ### Heat Exchanger Fluid ###
-
-# Ti = 283
-# To = 303
-# Cp = 3320
-# m = 0.12536
-# Rho = 1190
-
-# hef = Component(Cp, m, Rho, Ti, To)
-
-# ### Ammonia ###
-
-# Ti = 258
-# To = 273
-# Cp = 3320
-# m = 0.255
-# Rho = 1190
-
-# ammonia = Component(Cp, m, Rho, Ti, To)
-
-# ### Air3 ###
-
-# Ti = 293
-# To = 291
-# Cp = 1003
-# m = 0.3675
-# Rho = 1190
-
-# air3 = Component(Cp, m, Rho, Ti, To)
 
 ######################
 ### HEX Properties ###
@@ -95,12 +43,12 @@ nitrogen.add_data("nitrogen40bar")
 name = 'Heat Exchanger 1 (E-3)'
 hexType = 'tube'
 coldFluid = nitrogen
-hotFluid = air1
+hotFluid = air
 U = 120
 Di = 0.02
 L = 0.25
 basis = 'hot'
-correctionFactor = 0.95
+correctionFactor = 1
 
 HEX1 = STHE(name, hexType, coldFluid, hotFluid, U, basis, correctionFactor)
 HEX1.define(L, Di)
@@ -110,36 +58,41 @@ HEX1.define(L, Di)
 name = 'Heat Exchanger 1 (E-3)'
 hexType = 'plate'
 coldFluid = nitrogen
-hotFluid = air1
+hotFluid = air
 U = 30
-W = 0.4
-L = 0.8
 basis = 'hot'
 correctionFactor = 0.95
+W = 0.4
+L = 0.8
+D_port = 0.1
+angle = 65
+phi = 1.2
+passes = 1
+tp = 0.008
+b = 0.005
+k_plate = 205
 
 HEX2 = PHE(name, hexType, coldFluid, hotFluid, U, basis, correctionFactor)
-HEX2.define(L, W)
+HEX2.define(L, W, angle, phi, passes, tp, b, D_port, k_plate)
 
-# ### HEX 2 ###
+### HEX 3 ###
 
-# name = 'Heat Exchanger 2'
-# hexType = 'tube'
-# coldFluid = hef
-# hotFluid = refHot
-# U = 300
-# Di = 0.1
-# L = 1
+name = 'Heat Exchanger 1 (E-3)'
+hexType = 'plate'
+coldFluid = nitrogen
+hotFluid = air
+U = 30.31
+basis = 'hot'
+correctionFactor = 0.95
+W = 0.3
+L = 0.7
+D_port = 0.1
+angle = 65
+phi = 1.2
+passes = 1
+tp = 0.002
+b = 0.005
+k_plate = 205
 
-# HEX2 = HeatExchanger(name, hexType, coldFluid, hotFluid, U, Di, L)
-
-# ### HEX 3 ###
-
-# name = 'Heat Exchanger 3'
-# hexType = 'tube'
-# coldFluid = refCold
-# hotFluid = air2
-# U = 170
-# Di = 0.05
-# L = 0.5
-
-# HEX3 = HeatExchanger(name, hexType, coldFluid, hotFluid, U, Di, L)
+HEX3 = PHE(name, hexType, coldFluid, hotFluid, U, basis, correctionFactor)
+HEX3.define(L, W, tp, phi, passes, angle, b, D_port, k_plate)
