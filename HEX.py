@@ -42,7 +42,7 @@ class HeatExchanger():
         This method makes use of enthalpy data from NIST, a number of slices are defined and the area is approximated as linear across these slices."""
         
         if slices == 0:
-            return 0, 0
+            return 0
         dt = (self.coldFluid.To - self.coldFluid.Ti)/slices
         coldTs = [self.coldFluid.Ti]
         coldHs = [self.coldFluid.lookup('enth', self.coldFluid.Ti)]
@@ -212,8 +212,12 @@ class PHE(HeatExchanger):
                 self.m = pressureParams[angle][ranges[i-1]][1]
 
     def fluid_analysis(self, fluid, T):
-        m_c = fluid.m/self.channels
+        m_c = fluid.m/(self.channels/2)
         G_c = m_c / (self.W * self.b)
+        fluid.Re = []
+        fluid.Nu = []
+        fluid.Pr = []
+        fluid.convec = []
 
         if fluid == self.coldFluid:
             Re = (G_c * self.D_e)/ fluid.lookup('mu', T)
@@ -221,6 +225,13 @@ class PHE(HeatExchanger):
             Pr = (fluid.lookup('Cp', T) * fluid.lookup('mu', T)) / fluid.lookup('k', T)
             Nu = self.Ch * (Re ** self.n) * (Pr ** (1/3)) * (fluid.lookup('mu', T) / fluid.mu_w) ** 0.17
             h = (Nu * fluid.lookup('k', T)) / self.D_e
+
+            fluid.rho.append(fluid.lookup('rho', T))
+            fluid.Cp.append(fluid.lookup('Cp', T))
+            fluid.Re.append(Re)
+            fluid.Pr.append(Pr)
+            fluid.Nu.append(Nu)
+            fluid.convec.append(h)
 
             G_p = (4 * fluid.m)/(np.pi * self.d_p**2)
             f = self.Kp / (Re ** self.m)
@@ -236,6 +247,11 @@ class PHE(HeatExchanger):
             Nu = self.Ch * (Re ** self.n) * (Pr ** (1/3)) * (fluid.mu / fluid.mu_w) ** 0.17
             h = (Nu * fluid.k) / self.D_e
 
+            fluid.Re.append(Re)
+            fluid.Pr.append(Pr)
+            fluid.Nu.append(Nu)
+            fluid.convec.append(h)
+
             G_p = (4 * fluid.m)/(np.pi * self.d_p**2)
             f = self.Kp / (Re ** self.m)
             dP_plate = ((2 * f * (self.d_p + self.L) * self.passes * G_c ** 2) / (fluid.rho * self.D_e)) + 1
@@ -247,10 +263,14 @@ class PHE(HeatExchanger):
 
     def analysis(self, slices):
         self.number_required(self.sizeHTU('hot', slices))
-        self.channels = np.ceil(self.plates) - 1
+        self.channels = np.ceil(self.plates) + 1
         self.D_e = (2 * self.b) / self.Phi
         Us = []
-        dPs = []
+        dPc = []
+        dPh = []
+        self.coldFluid.rho = []
+        self.coldFluid.Cp = []
+        
         for i in range(len(self.coldFluid.Tdistro)):
             Th = self.hotFluid.Tdistro[-1-i]
             Tc = self.coldFluid.Tdistro[i]
@@ -258,6 +278,14 @@ class PHE(HeatExchanger):
             hot_h, hot_dp = self.fluid_analysis(self.hotFluid, Th)
             U = 1/((1/hot_h) + (self.t_p/self.k_p) + (1/cold_h) + self.hotFluid.R_f + self.coldFluid.R_f)
             Us.append(U)
-            dPs.append(cold_dp + hot_dp)
+            dPc.append(cold_dp)
+            dPh.append(hot_dp)
 
-        return Us, dPs
+        return Us, dPc, dPh
+
+    def find_mass(self, temp):
+        self.hotFluid.To = temp
+        dt = self.hotFluid.Ti - self.hotFluid.To
+        dh = self.coldFluid.lookup('enth', self.coldFluid.To) - self.coldFluid.lookup('enth', self.coldFluid.Ti)
+        self.hotFluid.m = (self.coldFluid.m * dh)/((self.hotFluid.Cp/1000)*dt)
+        print('{} -> {}'.format(temp, self.hotFluid.m))
